@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baraka Capital | Secure Investments</title>
+<style>
+body { font-family: Arial; margin: 0; background: #f4f4f4; }
+header { background: #0b3d91; color: white; padding: 20px; text-align: center; }
+nav { background: #222; padding: 10px; text-align: center; position: sticky; top: 0; }
+nav a { color: white; margin: 0 10px; text-decoration: none; }
+section { padding: 40px; text-align: center; }
+.card { background: white; padding: 20px; margin: 20px auto; width: 300px; border-radius: 10px; }
+button { padding: 10px; background: #0b3d91; color: white; border: none; cursor: pointer; }
+input { padding: 8px; margin: 5px; width: 80%; }
+footer { background: #222; color: white; text-align: center; padding: 20px; }
+.hidden { display: none; }
+</style>
+</head>
+<body><header>
+<h1>Baraka Capital</h1>
+<p>Smart Investments. Secure Future.</p>
+</header><nav>
+<a href="#">Home</a>
+<a href="#about">About</a>
+<a href="#dashboard">Dashboard</a>
+<a href="#faq">FAQ</a>
+<a href="#contact">Contact</a>
+</nav><section id="about">
+<h2>About Us</h2>
+<p>Baraka Capital helps individuals learn and grow financially through smart investment practices.</p>
+</section><section id="auth">
+<h2>Login / Register</h2>
+<input type="text" id="username" placeholder="Username"><br>
+<input type="password" id="password" placeholder="Password"><br>
+<button onclick="register()">Register</button>
+<button onclick="login()">Login</button>
+<p id="authMsg"></p>
+</section><section id="dashboard" class="hidden">
+<h2>Dashboard</h2>
+<p>Welcome, <span id="userDisplay"></span></p>
+<p>Balance: KES <span id="balance">0</span></p><div class="card">
+<h3>Deposit</h3>
+<input type="number" id="depositAmt" placeholder="Amount">
+<button onclick="deposit()">Deposit</button>
+</div><div class="card">
+<h3>Withdraw</h3>
+<input type="number" id="withdrawAmt" placeholder="Amount">
+<button onclick="withdraw()">Withdraw</button>
+</div><h3>Transaction History</h3>
+<table border="1" style="margin:auto;">
+<thead>
+<tr><th>Type</th><th>Amount</th></tr>
+</thead>
+<tbody id="history"></tbody>
+</table><p><b>Disclaimer:</b> Investments carry risk. Returns are not guaranteed.</p>
+</section><section id="faq">
+<h2>FAQ</h2>
+<p><b>How does it work?</b> Register, login and simulate investments.</p>
+</section><section id="contact">
+<h2>Contact</h2>
+<p>Phone: 0116315885</p>
+<p>Email: barakacapital@gmail.com</p>
+</section><footer>
+<p>© 2026 Baraka Capital</p>
+</footer><script>
+let currentUser = null;
+
+function register() {
+    let user = document.getElementById('username').value;
+    let pass = document.getElementById('password').value;
+    if (!user || !pass) return;
+
+    localStorage.setItem(user, JSON.stringify({ password: pass, balance: 0, history: [] }));
+    document.getElementById('authMsg').innerText = "Registered successfully!";
+}
+
+function login() {
+    let user = document.getElementById('username').value;
+    let pass = document.getElementById('password').value;
+    let data = JSON.parse(localStorage.getItem(user));
+
+    if (data && data.password === pass) {
+        currentUser = user;
+        document.getElementById('auth').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('userDisplay').innerText = user;
+        updateUI();
+    } else {
+        document.getElementById('authMsg').innerText = "Invalid login";
+    }
+}
+
+function deposit() {
+    let amt = parseInt(document.getElementById('depositAmt').value);
+    if (amt <= 0) return;
+
+    let data = JSON.parse(localStorage.getItem(currentUser));
+    data.balance += amt;
+    data.history.push({ type: 'Deposit', amount: amt });
+    localStorage.setItem(currentUser, JSON.stringify(data));
+    updateUI();
+}
+
+function withdraw() {
+    let amt = parseInt(document.getElementById('withdrawAmt').value);
+    let data = JSON.parse(localStorage.getItem(currentUser));
+
+    if (amt > data.balance) {
+        alert("Insufficient balance");
+        return;
+    }
+
+    data.balance -= amt;
+    data.history.push({ type: 'Withdraw', amount: amt });
+    localStorage.setItem(currentUser, JSON.stringify(data));
+    updateUI();
+}
+
+function updateUI() {
+    let data = JSON.parse(localStorage.getItem(currentUser));
+    document.getElementById('balance').innerText = data.balance;
+
+    let historyHTML = "";
+    data.history.forEach(tx => {
+        historyHTML += `<tr><td>${tx.type}</td><td>${tx.amount}</td></tr>`;
+    });
+    document.getElementById('history').innerHTML = historyHTML;
+}
+</script></body>
+</html>
